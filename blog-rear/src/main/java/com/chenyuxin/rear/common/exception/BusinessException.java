@@ -1,0 +1,26 @@
+package com.chenyuxin.rear.common.exception;
+
+import lombok.Getter;
+
+/**
+ * 业务异常类，用于封装业务逻辑中的异常信息
+ */
+@Getter
+public class BusinessException extends RuntimeException {
+
+    private final int code;
+
+    public BusinessException(int code, String message) {
+        super(message);
+        this.code = code;
+    }
+
+    public BusinessException(String message) {
+        this(500, message);
+    }
+
+    public BusinessException(ErrorCode errorCode){
+        super(errorCode.getMessage());
+        this.code = errorCode.getCode();
+    }
+}

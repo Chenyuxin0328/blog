@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.chenyuxin.rear.module.post.mapper.PostMapper">
+
+    <resultMap id="PagePostVoMap" type="com.chenyuxin.rear.module.post.model.vo.PagePostVo">
+        <id property="id" column="post_id"/>
+        <result property="text" column="text"/>
+        <result property="location" column="location"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createTime" column="create_time"/>
+
+        <collection property="imageUrls" ofType="string">
+            <result column="image_url"/>
+        </collection>
+
+        <collection property="commentVos" ofType="com.chenyuxin.rear.module.post.model.vo.CommentVo">
+            <result property="commentId" column="comment_id"/>
+            <result property="userId" column="comment_user_id"/>
+            <result property="username" column="comment_username"/>
+            <result property="avatar" column="comment_avatar"/>
+            <result property="content" column="comment_content"/>
+        </collection>
+    </resultMap>
+    <select id="countByViewScope" resultType="int">
+        SELECT COUNT(*)
+        FROM blog.post
+        WHERE is_delete = 0 AND view_scope &lt;= #{viewScope}
+    </select>
+
+    <select id="selectPagePost" resultMap="PagePostVoMap">
+        SELECT
+        p.id AS post_id,
+        p.text,
+        p.location,
+        p.like_count,
+        p.comment_count,
+        p.create_time,
+        fs.url AS image_url,
+        c.id AS comment_id,
+        c.content AS comment_content,
+        u.id AS comment_user_id,
+        u.username AS comment_username,
+        u.avatar AS comment_avatar
+
+        FROM (
+        SELECT *
+        FROM blog.post
+        WHERE is_delete = 0 AND view_scope &lt;= #{viewScope}
+        ORDER BY create_time DESC
+        limit #{offset},#{pageSize}
+        ) p
+        LEFT JOIN blog.post_image pi ON p.id = pi.post_id
+        LEFT JOIN blog.file_storage fs ON pi.file_id = fs.id
+        LEFT JOIN blog.post_comment c ON p.id = c.post_id AND c.is_delete = 0
+        LEFT JOIN blog.user u ON c.user_id = u.id
+    </select>
+    <select id="getLikeAndCommentStats" resultType="map">
+        SELECT
+            SUM(like_count),
+            SUM(comment_count)
+        FROM blog.post
+        WHERE is_delete = 0
+    </select>
+
+
+
+</mapper>

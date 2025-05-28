@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.chenyuxin.rear.module.stats.mapper.WeeklyStatsMapper">
+
+    <select id="selectRecentSevenWeeks" resultType="com.chenyuxin.rear.module.stats.model.vo.GetSevenWeekStatsVo">
+        SELECT
+            stat_week,
+            visitor_count AS visitorCount,
+            post_count AS postCount,
+            doc_count AS docCount
+        FROM (
+                 SELECT
+                     stat_week,
+                     visitor_count,
+                     post_count,
+                     doc_count
+                 FROM weekly_stats
+                 ORDER BY stat_week DESC
+                 LIMIT 7
+             ) AS recent_weeks
+        ORDER BY stat_week
+    </select>
+    <resultMap id="GetTotalStatisticVoMap" type="com.chenyuxin.rear.module.stats.model.vo.GetTotalStatisticVo">
+        <result property="total_view" column="total_view"/>
+        <result property="total_post" column="total_post"/>
+        <result property="total_doc" column="total_doc"/>
+    </resultMap>
+    <select id="getTotalStatistic" resultMap="GetTotalStatisticVoMap">
+        SELECT
+            SUM(visitor_count) AS total_view,
+            SUM(post_count) AS total_post,
+            SUM(doc_count) AS total_doc
+        FROM weekly_stats
+    </select>
+
+
+
+
+
+</mapper>

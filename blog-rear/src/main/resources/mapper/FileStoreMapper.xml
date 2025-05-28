@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.chenyuxin.rear.module.doc.mapper.DocMapper">
+
+    <resultMap id="PageDocVoMap" type="com.chenyuxin.rear.module.doc.model.vo.PageDocVo">
+        <id property="id" column="id"/>
+        <result property="backgroundUrl" column="background_url"/>
+        <result property="title" column="title"/>
+        <result property="general" column="general"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="url" column="url"/>
+        <result property="like" column="like"/>
+        <result property="comment" column="comment"/>
+        <result property="writeTime" column="write_time"/>
+        <result property="viewScope" column="view_scope"/>
+    </resultMap>
+
+    <select id="selectPageDocVo" resultMap="PageDocVoMap">
+        SELECT
+        d.id,
+        f.url AS background_url,
+        d.title,
+        d.general,
+        c.category_name,
+        d.url,
+        d.`like`,
+        d.comment,
+        d.write_time,
+        d.view_scope
+        FROM doc d
+        LEFT JOIN file_storage f ON d.background_id = f.id
+        LEFT JOIN doc_category c ON d.category_id = c.id
+        WHERE d.is_delete = 0
+        AND #{viewScope} >= d.view_scope
+        <if test="categoryId != null">
+            AND d.category_id = #{categoryId}
+        </if>
+        <if test="search != null and search != ''">
+            AND (d.title LIKE CONCAT('%', #{search}, '%') OR d.general LIKE CONCAT('%', #{search}, '%'))
+        </if>
+        ORDER BY d.write_time
+    </select>
+    <select id="selectPageDocVoDesc" resultMap="PageDocVoMap">
+        SELECT
+        d.id,
+        f.url AS background_url,
+        d.title,
+        d.general,
+        c.category_name,
+        d.url,
+        d.`like`,
+        d.comment,
+        d.write_time,
+        d.view_scope
+        FROM doc d
+        LEFT JOIN file_storage f ON d.background_id = f.id
+        LEFT JOIN doc_category c ON d.category_id = c.id
+        WHERE d.is_delete = 0
+        AND #{viewScope} >= d.view_scope
+        <if test="categoryId != null">
+            AND d.category_id = #{categoryId}
+        </if>
+        <if test="search != null and search != ''">
+            AND (d.title LIKE CONCAT('%', #{search}, '%') OR d.general LIKE CONCAT('%', #{search}, '%'))
+        </if>
+        ORDER BY d.write_time DESC
+    </select>
+
+
+</mapper>

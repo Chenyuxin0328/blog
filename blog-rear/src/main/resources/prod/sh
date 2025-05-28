@@ -1,0 +1,15 @@
+docker run -d \
+  --name mysql8 \
+  -e MYSQL_ROOT_PASSWORD=mysql123 \
+  -p 3307:3306 \
+  -v /opt/mysql8/data:/var/lib/mysql \
+  -v /opt/mysql8/conf.d:/etc/mysql/conf.d \
+  --restart unless-stopped \
+  mysql:8.0
+#后端部署
+docker build -t blog-rear:1.0 .
+docker run -d \
+  --name blog-rear \
+  -p 8082:8082 \
+  --restart unless-stopped \
+  blog-rear:1.0

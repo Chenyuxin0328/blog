@@ -1,0 +1,5 @@
+# 忽略 application-prod.yml 文件
+application-prod.yml
+
+# 忽略 target 文件夹及其所有内容
+target/

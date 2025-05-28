@@ -1,0 +1,36 @@
+{
+  "name": "front",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "echarts": "^5.6.0",
+    "element-plus": "^2.9.10",
+    "vue": "^3.5.13",
+    "vue-echarts": "^7.0.3",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "vite": "^6.2.4",
+    "vite-plugin-vue-devtools": "^7.7.2"
+  },
+  "icons": {
+    "description": "将你的七个图标文件放在 src/assets/icons 目录下，文件命名如下：",
+    "files": [
+      "logo.png - 网站Logo图标",
+      "friends.png - 朋友圈图标",
+      "docs.png - 文档图标",
+      "about.png - 关于我图标",
+      "search.png - 搜索图标",
+      "category.png - 分类图标",
+      "recent.png - 近期文章图标"
+    ]
+  }
+}
