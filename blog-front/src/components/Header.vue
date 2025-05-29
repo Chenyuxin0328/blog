@@ -19,6 +19,10 @@
         <img src="@/assets/icons/about.png" alt="关于我" class="nav-icon" />
         关于我
       </router-link>
+      <router-link to="/login" class="nav-item login-btn">
+        <img src="@/assets/icons/登录.png" alt="登录/注册" class="nav-icon" />
+        {{ loginButtonText }}
+      </router-link>
     </nav>
   </header>
 </template>
@@ -33,6 +37,16 @@ const route = useRoute();
 const shouldShowHeader = computed(() => {
   return route.path !== '/';
 });
+
+// 获取登录状态
+const isLoggedIn = computed(() => {
+  return !!localStorage.getItem('token');
+});
+
+// 登录/注册按钮文本
+const loginButtonText = computed(() => {
+  return isLoggedIn.value ? '个人中心' : '登录/注册';
+});
 </script>
 
 <style scoped>
@@ -40,13 +54,16 @@ const shouldShowHeader = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px; /* 更紧凑 */
+  padding: 8px 16px;
   background: linear-gradient(to top, rgba(255, 200, 200, 0.7), rgba(255, 255, 255, 0.7));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
-  border-radius: 20px;
-  margin: 10px;
+  border-radius: 16px;
+  margin: 8px;
   border-bottom: 2px solid rgba(255, 150, 150, 0.5);
+  position: sticky;
+  top: 8px;
+  z-index: 100;
 }
 
 .logo {
@@ -77,8 +94,8 @@ const shouldShowHeader = computed(() => {
 }
 
 .logo-icon {
-  height: 40px;
-  margin-right: 10px;
+  height: 35px;
+  margin-right: 8px;
   transition: transform 0.3s ease;
 }
 
@@ -101,10 +118,10 @@ const shouldShowHeader = computed(() => {
   align-items: center;
   text-decoration: none;
   color: #333;
-  padding: 8px 15px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   position: relative;
   overflow: hidden;
@@ -144,9 +161,30 @@ const shouldShowHeader = computed(() => {
 }
 
 .nav-icon {
-  height: 25px;
-  margin-right: 8px;
+  height: 22px;
+  margin-right: 6px;
   transition: all 0.3s ease;
+}
+
+.login-btn {
+  background: linear-gradient(45deg, #ffb6c1, #ffc0cb);  /* 更柔和的粉色 */
+  color: white !important;
+  font-weight: 600;
+  border: none;
+  margin-left: 10px;
+  font-size: 1rem;  /* 更小的字体 */
+  padding: 6px 12px;  /* 更小的内边距 */
+}
+
+.login-btn:hover {
+  background: linear-gradient(45deg, #ffc0cb, #ffb6c1);
+  transform: translateY(-2px);  /* 减小悬停时的上移距离 */
+  box-shadow: 0 3px 8px rgba(255, 182, 193, 0.4);  /* 更柔和的阴影 */
+}
+
+.login-btn.router-link-active {
+  background: linear-gradient(45deg, #ffc0cb, #ffb6c1);
+  color: white !important;
 }
 
 @media (max-width: 768px) {
@@ -165,6 +203,10 @@ const shouldShowHeader = computed(() => {
   .nav-item {
     padding: 8px 12px;
     font-size: 1rem;
+  }
+
+  .login-btn {
+    margin-left: 0;
   }
 }
 </style>

@@ -1,44 +1,46 @@
 <!-- views/PostPage.vue -->
 <template>
-  <div class="main-container">
-    <div class="left-panel">
-      <div class="content-wrapper">
-        <!-- 加载状态 -->
-        <div v-if="loading && posts.length === 0" class="loading-wrapper">
-          <el-skeleton :rows="5" animated style="padding: 20px;" />
-        </div>
-        
-        <!-- 错误提示 -->
-        <el-alert
-          v-if="error"
-          title="加载失败"
-          type="error"
-          description="无法加载朋友圈内容，请稍后重试"
-          show-icon
-          style="margin-bottom: 20px;"
-        />
-        
-        <!-- 朋友圈列表 -->
-        <PostList 
-          v-if="posts.length > 0" 
-          :posts="posts" 
-          @comment="handleComment"
-        />
-        
-        <!-- 底部加载更多提示 -->
-        <div v-if="loading && posts.length > 0" class="loading-more">
-          <el-skeleton :rows="1" animated />
-        </div>
-        
-        <!-- 全部加载完毕提示 -->
-        <div v-if="!loading && !hasMore && posts.length > 0" class="no-more">
-          已经到底啦，没有更多内容了~
+  <div class="main-content">
+    <div class="main-container">
+      <div class="left-panel">
+        <div class="content-wrapper">
+          <!-- 加载状态 -->
+          <div v-if="loading && posts.length === 0" class="loading-wrapper">
+            <el-skeleton :rows="5" animated style="padding: 20px;" />
+          </div>
+          
+          <!-- 错误提示 -->
+          <el-alert
+            v-if="error"
+            title="加载失败"
+            type="error"
+            description="无法加载朋友圈内容，请稍后重试"
+            show-icon
+            style="margin-bottom: 20px;"
+          />
+          
+          <!-- 朋友圈列表 -->
+          <PostList 
+            v-if="posts.length > 0" 
+            :posts="posts" 
+            @comment="handleComment"
+          />
+          
+          <!-- 底部加载更多提示 -->
+          <div v-if="loading && posts.length > 0" class="loading-more">
+            <el-skeleton :rows="1" animated />
+          </div>
+          
+          <!-- 全部加载完毕提示 -->
+          <div v-if="!loading && !hasMore && posts.length > 0" class="no-more">
+            已经到底啦，没有更多内容了~
+          </div>
         </div>
       </div>
-    </div>
-    <div class="right-panel">
-      <div class="content-wrapper">
-        <PostChart />
+      <div class="right-panel">
+        <div class="content-wrapper">
+          <PostChart />
+        </div>
       </div>
     </div>
   </div>

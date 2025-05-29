@@ -33,7 +33,8 @@ onMounted(() => {
 
 body {
   font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(to right bottom, #ffffff 0%, #ffd6dd 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffd6dd 100%) fixed;
+  background-size: cover;
   color: #333;
   line-height: 1.6;
   min-height: 100vh;
@@ -43,10 +44,31 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
+}
+
+/* 添加一个半透明的遮罩层，让内容更容易阅读 */
+.app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .main-content {
   flex-grow: 1;
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  margin-top: 10px; /* 减小与header的间距 */
+  overflow-y: auto;
+  min-height: calc(100vh - 80px);
 }
 
 a {

@@ -217,6 +217,8 @@ const showWechatImage = () => {
   justify-content: center;
   align-items: center;
   text-align: center;
+  position: relative;
+  z-index: 10;
 }
 
 .dog-img {
@@ -226,6 +228,8 @@ const showWechatImage = () => {
   transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.1));
+  position: relative;
+  z-index: 10;
 }
 
 .dog-img:hover {
@@ -252,6 +256,8 @@ const showWechatImage = () => {
   margin-bottom: 50px;
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
+  position: relative;
+  z-index: 10;
 }
 
 .about-right h2:hover {
@@ -264,6 +270,8 @@ const showWechatImage = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .contact-link {
@@ -273,6 +281,8 @@ const showWechatImage = () => {
   margin: 10px 0;
   width: 100%;
   cursor: pointer;
+  position: relative;
+  z-index: 10;
 }
 
 .contact-link img {

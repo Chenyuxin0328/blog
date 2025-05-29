@@ -1,67 +1,69 @@
 <template>
-  <div class="home">
-    <div class="content-wrapper">
-      <!-- 加载状态 -->
-      <div v-if="loading && docs.length === 0" class="loading animate-item">
-        <el-skeleton :rows="5" animated />
-      </div>
-      
-      <!-- 错误提示 -->
-      <el-alert
-        v-if="error"
-        title="加载失败"
-        type="error"
-        description="无法加载技术文档，请稍后重试"
-        show-icon
-        class="animate-item"
-      />
-      
-      <div v-if="!loading || docs.length > 0" class="posts-container">
-        <div v-if="docs.length === 0" class="no-data animate-item">
-          <el-empty description="暂无技术文档" />
+  <div class="main-content">
+    <div class="home">
+      <div class="content-wrapper">
+        <!-- 加载状态 -->
+        <div v-if="loading && docs.length === 0" class="loading animate-item">
+          <el-skeleton :rows="5" animated />
         </div>
         
-        <div class="post-row" v-for="(postPair, index) in chunkedDocs" :key="index">
-          <PostCard
-            v-for="doc in postPair"
-            :key="doc.id"
-            :id="doc.id"
-            :title="doc.title || '无标题'"
-            :description="(doc.general || '暂无描述') + '...'"
-            :image="doc.backgroundUrl || '/images/desert.png'"
-            :date="doc.writeTime || '未知日期'"
-            class="animate-item"
-            :style="{ animationDelay: `${index * 0.15 + 0.1}s` }"
-            @click="viewDoc(doc.id)"
+        <!-- 错误提示 -->
+        <el-alert
+          v-if="error"
+          title="加载失败"
+          type="error"
+          description="无法加载技术文档，请稍后重试"
+          show-icon
+          class="animate-item"
+        />
+        
+        <div v-if="!loading || docs.length > 0" class="posts-container">
+          <div v-if="docs.length === 0" class="no-data animate-item">
+            <el-empty description="暂无技术文档" />
+          </div>
+          
+          <div class="post-row" v-for="(postPair, index) in chunkedDocs" :key="index">
+            <PostCard
+              v-for="doc in postPair"
+              :key="doc.id"
+              :id="doc.id"
+              :title="doc.title || '无标题'"
+              :description="(doc.general || '暂无描述') + '...'"
+              :image="doc.backgroundUrl || '/images/desert.png'"
+              :date="doc.writeTime || '未知日期'"
+              class="animate-item"
+              :style="{ animationDelay: `${index * 0.15 + 0.1}s` }"
+              @click="viewDoc(doc.id)"
+            />
+          </div>
+          
+          <!-- 底部加载更多提示 -->
+          <div v-if="loading && docs.length > 0" class="loading-more animate-item">
+            <el-skeleton :rows="1" animated />
+          </div>
+          
+          <!-- 全部加载完毕提示 -->
+          <div v-if="!loading && !hasMore && docs.length > 0" class="no-more animate-item">
+            已经到底啦，没有更多内容了~
+          </div>
+        </div>
+        
+        <div class="sidebar">
+          <SearchBox 
+            class="animate-item sidebar-item" 
+            style="animation-delay: 0.1s" 
+            @search="handleSearch"
           />
+          <CategoryList 
+            :categories="categories" 
+            :loading="loadingCategories"
+            :active-id="selectedCategoryId"
+            @select="handleCategorySelect"
+            class="animate-item sidebar-item" 
+            style="animation-delay: 0.2s" 
+          />
+          <RecentPosts class="animate-item sidebar-item" style="animation-delay: 0.3s" />
         </div>
-        
-        <!-- 底部加载更多提示 -->
-        <div v-if="loading && docs.length > 0" class="loading-more animate-item">
-          <el-skeleton :rows="1" animated />
-        </div>
-        
-        <!-- 全部加载完毕提示 -->
-        <div v-if="!loading && !hasMore && docs.length > 0" class="no-more animate-item">
-          已经到底啦，没有更多内容了~
-        </div>
-      </div>
-      
-      <div class="sidebar">
-        <SearchBox 
-          class="animate-item sidebar-item" 
-          style="animation-delay: 0.1s" 
-          @search="handleSearch"
-        />
-        <CategoryList 
-          :categories="categories" 
-          :loading="loadingCategories"
-          :active-id="selectedCategoryId"
-          @select="handleCategorySelect"
-          class="animate-item sidebar-item" 
-          style="animation-delay: 0.2s" 
-        />
-        <RecentPosts class="animate-item sidebar-item" style="animation-delay: 0.3s" />
       </div>
     </div>
   </div>
