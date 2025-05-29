@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { createApp } from 'vue'
 import HomeView from '../views/HomeView.vue'
 import LandingPage from '../views/LandingPage.vue'
-import DocsAlert from '../components/DocsAlert.vue'
+import DocsAlert from '@/components/DocsAlert.vue'
 
 const routes = [
   {
@@ -25,13 +25,20 @@ const routes = [
     name: 'docs',
     component: HomeView,
     beforeEnter: (to, from, next) => {
-      const docsAlert = document.createElement('div')
-      docsAlert.id = 'docs-alert'
-      document.body.appendChild(docsAlert)
-      
-      const alertComponent = createApp(DocsAlert).mount('#docs-alert')
-      alertComponent.showAlert()
-      
+      // 检查是否已经显示过提醒
+      const hasSeenAlert = localStorage.getItem('hasSeenDocsAlert')
+      if (!hasSeenAlert) {
+        // 创建提醒弹窗
+        const docsAlert = document.createElement('div')
+        docsAlert.id = 'docs-alert'
+        document.body.appendChild(docsAlert)
+        
+        const alertComponent = createApp(DocsAlert).mount('#docs-alert')
+        alertComponent.showAlert()
+        
+        // 记录已经显示过提醒
+        localStorage.setItem('hasSeenDocsAlert', 'true')
+      }
       next()
     }
   },

@@ -25,8 +25,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useAttrs } from 'vue';
 import { ElMessage } from 'element-plus';
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { getRecentDocs } from '@/api/doc';
 
 const attrs = useAttrs();
 const recentPosts = ref([]);
@@ -39,12 +38,8 @@ const currentYear = computed(() => {
 // 获取最近文章数据
 const fetchRecentPosts = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/doc/recently`);
-    if (response.data.code === 200) {
-      recentPosts.value = response.data.data;
-    } else {
-      throw new Error(response.data.message || '获取最近文章失败');
-    }
+    const res = await getRecentDocs();
+    recentPosts.value = res.data;
   } catch (error) {
     console.error('获取最近文章失败:', error);
     ElMessage.error('获取最近文章失败');

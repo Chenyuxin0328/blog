@@ -37,9 +37,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import * as echarts from 'echarts';
-import { post } from '@/api';
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { getWeekStats, getTotalStats } from '@/api/stats';
 import skill from '@/assets/icons/技术.png'
 import blogView from '@/assets/icons/博客访问次数.png'
 import friend from '@/assets/icons/朋友圈帖子总数.png'
@@ -67,34 +65,30 @@ const summaryData = ref([
 // 获取图表数据
 const fetchChartData = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/weeklystats/week`);
-    if (response.data.code === 200) {
-      const weekData = response.data.data;
-      const dates = ['本周', '上周', '两周前', '三周前', '四周前', '五周前', '六周前'];
+    const res = await getWeekStats();
+    const weekData = res.data;
+    const dates = ['本周', '上周', '两周前', '三周前', '四周前', '五周前', '六周前'];
 
-      // 处理技术文档数据
-      const docData = {
-        dates: dates,
-        counts: weekData.map(item => item.docCount).reverse() // 反转数组使最新数据在右侧
-      };
-      initDocChart(docData);
+    // 处理技术文档数据
+    const docData = {
+      dates: dates,
+      counts: weekData.map(item => item.docCount).reverse() // 反转数组使最新数据在右侧
+    };
+    initDocChart(docData);
 
-      // 处理朋友圈数据
-      const postData = {
-        dates: dates,
-        counts: weekData.map(item => item.postCount).reverse()
-      };
-      initPostChart(postData);
+    // 处理朋友圈数据
+    const postData = {
+      dates: dates,
+      counts: weekData.map(item => item.postCount).reverse()
+    };
+    initPostChart(postData);
 
-      // 处理访客数据
-      const visitorData = {
-        dates: dates,
-        counts: weekData.map(item => item.visitorCount).reverse()
-      };
-      initVisitorChart(visitorData);
-    } else {
-      throw new Error(response.data.message || '获取数据失败');
-    }
+    // 处理访客数据
+    const visitorData = {
+      dates: dates,
+      counts: weekData.map(item => item.visitorCount).reverse()
+    };
+    initVisitorChart(visitorData);
   } catch (error) {
     console.error('获取统计数据失败:', error);
     // 使用模拟数据
@@ -112,19 +106,15 @@ const fetchChartData = async () => {
 // 获取总计数据
 const fetchTotalStats = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/weeklystats/total`);
-    if (response.data.code === 200) {
-      const totalData = response.data.data;
-      summaryData.value = [
-        { title: '博客总访问量（次）', count: totalData.total_view, icon: blogView },
-        { title: '技术文档总数（篇）', count: totalData.total_doc, icon: skill },
-        { title: '朋友圈帖子数（章）', count: totalData.total_post, icon: friend },
-        { title: '帖子总点赞数（次）', count: totalData.total_like, icon: like },
-        { title: '帖子总评论数（次）', count: totalData.total_comment, icon: comment },
-      ];
-    } else {
-      throw new Error(response.data.message || '获取总计数据失败');
-    }
+    const res = await getTotalStats();
+    const totalData = res.data;
+    summaryData.value = [
+      { title: '博客总访问量（次）', count: totalData.total_view, icon: blogView },
+      { title: '技术文档总数（篇）', count: totalData.total_doc, icon: skill },
+      { title: '朋友圈帖子数（章）', count: totalData.total_post, icon: friend },
+      { title: '帖子总点赞数（次）', count: totalData.total_like, icon: like },
+      { title: '帖子总评论数（次）', count: totalData.total_comment, icon: comment },
+    ];
   } catch (error) {
     console.error('获取总计数据失败:', error);
   }

@@ -8,7 +8,7 @@ import request from '@/utils/request'
  * @returns {Promise} 请求结果
  */
 export function getPostList(pageNum, pageSize) {
-  return get('/post/page', {
+  return get('/api/post/page', {
     pageNum,
     pageSize
   })
@@ -21,7 +21,7 @@ export function getPostList(pageNum, pageSize) {
  */
 export function makeComment(data) {
   return request({
-    url: '/post/comment',
+    url: '/api/post/comment',
     method: 'post',
     data
   })
@@ -35,5 +35,5 @@ export function makeComment(data) {
  * @returns {Promise} 请求结果
  */
 export function getFriendsPosts(params) {
-  return get('/post/page', params)
+  return get('/api/post/page', params)
 } 

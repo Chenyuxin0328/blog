@@ -17,15 +17,16 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**") // 拦截所有 API 请求
-                .excludePathPatterns("/api/auth/**"); // 放行登录、注册等
+                .excludePathPatterns("/auth/**","/user/register","/user/avatar","/user/username");
     }
     
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*") // 允许所有来源，生产环境建议指定具体域名
+                .allowedOriginPatterns("http://localhost:5173","http://115.190.94.156:5173") // 允许所有来源，生产环境建议指定具体域名
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
+                .allowedHeaders("Authorization", "Content-Type", "X-Requested-With")
+                .exposedHeaders("Authorization")
                 .allowCredentials(true)
                 .maxAge(3600); // 预检请求的有效期，单位为秒
     }

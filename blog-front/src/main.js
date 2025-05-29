@@ -1,6 +1,7 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import ElementPlus from 'element-plus'
@@ -37,11 +38,13 @@ use([
 ])
 
 const app = createApp(App)
+const pinia = createPinia()
 
 // ✅ 全局注册 v-chart 组件
 app.component('v-chart', VueECharts)
 
 app.use(router)
 app.use(ElementPlus)
+app.use(pinia)
 
 app.mount('#app')

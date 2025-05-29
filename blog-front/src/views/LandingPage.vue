@@ -133,9 +133,8 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 import { ElNotification } from 'element-plus';
-import { API_BASE_URL } from '@/config';
+import { getVisitCount } from '@/api/stats';
 
 const router = useRouter();
 const techDogRotating = ref(false);
@@ -158,15 +157,14 @@ const handleExplore = () => {
     dangerouslyUseHTMLString: true
   });
 
-
   // 异步发送访客统计请求，不等待响应
-  axios.get(`${API_BASE_URL}/api/weeklystats/visitcount`)
-    .then(response => {
+  getVisitCount()
+    .then(() => {
       console.log('访客统计更新成功');
     })
     .catch(error => {
       console.error('访客统计更新失败:', error);
-  });
+    });
 
   // 直接跳转到首页
   router.push('/home');

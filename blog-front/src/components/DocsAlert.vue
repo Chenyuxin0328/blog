@@ -17,8 +17,14 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router'
+
 export default {
   name: 'DocsAlert',
+  setup() {
+    const router = useRouter()
+    return { router }
+  },
   data() {
     return {
       show: false

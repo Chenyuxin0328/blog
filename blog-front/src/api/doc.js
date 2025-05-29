@@ -9,7 +9,7 @@ import { get } from '@/utils/request'
  * @returns {Promise} 请求结果
  */
 export function getDocPage(params) {
-  return get('/doc/page', params)
+  return get('/api/doc/page', params)
 }
 
 /**
@@ -18,7 +18,7 @@ export function getDocPage(params) {
  * @returns {Promise} 请求结果
  */
 export function getDocById(id) {
-  return get(`/doc/${id}`)
+  return get(`/api/doc/${id}`)
 }
 
 /**
@@ -26,5 +26,13 @@ export function getDocById(id) {
  * @returns {Promise} 请求结果，包含分类列表
  */
 export function getDocCategories() {
-  return get('/doc/category')
+  return get('/api/doc/category')
+}
+
+/**
+ * 获取最近文档列表
+ * @returns {Promise} 请求结果
+ */
+export function getRecentDocs() {
+  return get('/api/doc/recently')
 } 

@@ -1,127 +1,101 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { API_BASE_URL, API_TIMEOUT } from '@/config'
+import { API_BASE_URL } from '@/config'
+import router from '@/router'
 
-// 创建axios实例
-const service = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
-  timeout: API_TIMEOUT
+// 创建 axios 实例
+const request = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  // 允许携带cookie
+  withCredentials: true,
+  // 允许获取响应头
+  exposedHeaders: ['Authorization']
 })
 
-// request拦截器
-service.interceptors.request.use(
+// 请求拦截器
+request.interceptors.request.use(
   config => {
-    console.log('发送请求:', config.url, config)
-    // 从localStorage获取token
-    const token = localStorage.getItem('token')
-    if (token) {
-      // 让每个请求携带自定义token
-      config.headers['Authorization'] = 'Bearer ' + token
+    // 确保headers对象存在
+    if (!config.headers) {
+      config.headers = {}
     }
+
+    // 设置通用headers
+    config.headers['Content-Type'] = 'application/json'
+    config.headers['Accept'] = 'application/json'
+
+    // 获取并设置token（如果存在）
+    const token = localStorage.getItem('token')
+    if (token && token !== 'undefined' && token !== 'null') {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+
     return config
   },
   error => {
-    console.error('请求错误:', error)
+    ElMessage.error('请求配置错误')
     return Promise.reject(error)
   }
 )
 
-// response拦截器
-service.interceptors.response.use(
+// 响应拦截器
+request.interceptors.response.use(
   response => {
-    console.log('收到响应:', response)
-    const res = response.data
-    // 如果后端返回的状态码不是200，说明接口异常，应该提示错误信息
-    if (res.code !== 200) {
-      ElMessage({
-        message: res.message || '系统错误',
-        type: 'error',
-        duration: 5 * 1000
-      })
+    // 保存响应头中的token（如果有的话）
+    const authHeader = response.headers?.authorization
+    if (authHeader) {
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader
+      localStorage.setItem('token', token)
+    }
 
-      // 401: 未登录或Token过期
+    const res = response.data
+    if (res.code !== 200) {
+      ElMessage.error(res.message || '请求失败')
+      // 处理特定的错误码
       if (res.code === 401) {
-        // 清除用户信息并跳转到登录页
+        // token过期或无效
         localStorage.removeItem('token')
         localStorage.removeItem('userInfo')
-        setTimeout(() => {
-          window.location.href = '/'
-        }, 1500)
+        router.push('/login')
       }
-      return Promise.reject(new Error(res.message || '系统错误'))
-    } else {
-      return res
+      return Promise.reject(new Error(res.message || '请求失败'))
     }
+    return res
   },
   error => {
-    console.error('响应错误:', error)
-    console.error('错误配置:', error.config)
     if (error.response) {
-      console.error('错误响应:', error.response)
-    }
-    
-    // 处理网络错误
-    let message = ''
-    if (error && error.response) {
       switch (error.response.status) {
-        case 400:
-          message = '请求错误'
-          break
         case 401:
-          message = '未授权，请登录'
-          // 清除用户信息并跳转到登录页
+          ElMessage.error('未授权，请重新登录')
           localStorage.removeItem('token')
           localStorage.removeItem('userInfo')
-          setTimeout(() => {
-            window.location.href = '/'
-          }, 1500)
+          router.push('/login')
           break
         case 403:
-          message = '拒绝访问'
+          ElMessage.error('拒绝访问')
           break
         case 404:
-          message = '请求地址出错'
-          break
-        case 408:
-          message = '请求超时'
+          ElMessage.error('请求错误，未找到该资源')
           break
         case 500:
-          message = '服务器内部错误'
-          break
-        case 501:
-          message = '服务未实现'
-          break
-        case 502:
-          message = '网关错误'
-          break
-        case 503:
-          message = '服务不可用'
-          break
-        case 504:
-          message = '网关超时'
-          break
-        case 505:
-          message = 'HTTP版本不受支持'
+          ElMessage.error('服务器错误')
           break
         default:
-          message = '网络连接错误'
+          ElMessage.error(error.message || '请求失败')
       }
+    } else if (error.request) {
+      ElMessage.error('网络错误，请检查您的网络连接')
     } else {
-      message = '网络连接错误'
+      ElMessage.error('请求配置错误')
     }
-
-    ElMessage({
-      message: message,
-      type: 'error',
-      duration: 5 * 1000
-    })
     return Promise.reject(error)
   }
 )
 
 // 封装GET请求
 export function get(url, params) {
-  return service({
+  return request({
     url,
     method: 'get',
     params
@@ -130,7 +104,7 @@ export function get(url, params) {
 
 // 封装POST请求
 export function post(url, data) {
-  return service({
+  return request({
     url,
     method: 'post',
     data
@@ -139,7 +113,7 @@ export function post(url, data) {
 
 // 封装PUT请求
 export function put(url, data) {
-  return service({
+  return request({
     url,
     method: 'put',
     data
@@ -148,12 +122,11 @@ export function put(url, data) {
 
 // 封装DELETE请求
 export function del(url, params) {
-  return service({
+  return request({
     url,
     method: 'delete',
     params
   })
 }
 
-// 导出service
-export default service 
+export default request

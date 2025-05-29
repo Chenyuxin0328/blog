@@ -58,11 +58,11 @@
 
       <!-- 评论输入框 -->
       <div class="comment-input-container" v-if="activeCommentId === item.id">
-        <input 
-          type="text" 
-          class="comment-input" 
-          v-model="commentText" 
-          placeholder="写下你的评论..." 
+        <input
+          type="text"
+          class="comment-input"
+          v-model="commentText"
+          placeholder="写下你的评论..."
           @keyup.enter="submitComment(item.id)"
         />
         <button class="comment-submit" @click="submitComment(item.id)">发送</button>
@@ -132,13 +132,13 @@ const toggleCommentInput = (postId) => {
 // 提交评论
 const submitComment = (postId) => {
   if (!commentText.value.trim()) return
-  
+
   // 向父组件发送评论事件
   emit('comment', {
     postId,
     content: commentText.value.trim()
   })
-  
+
   // 清空评论内容
   commentText.value = ''
   // 隐藏评论输入框
@@ -154,12 +154,12 @@ const previewImage = (imageUrl) => {
 // 修改图片分组逻辑
 const splitImages = (images) => {
   if (!images || images.length === 0) return []
-  
+
   // 如果只有一张图片，直接返回单个数组
   if (images.length === 1) {
     return [images]
   }
-  
+
   // 多张图片保持原有的5张一行逻辑
   const rows = []
   for (let i = 0; i < images.length; i += 5) {
@@ -174,10 +174,10 @@ const handleLike = (postId) => {
   if (!likeCounters.value[postId]) {
     likeCounters.value[postId] = 0
   }
-  
+
   // 增加本地计数
   likeCounters.value[postId]++
-  
+
   // 更新UI显示
   const post = props.posts.find(p => p.id === postId)
   if (post) {
@@ -197,7 +197,7 @@ const handleLike = (postId) => {
         postId: postId,
         count: likeCounters.value[postId]
       })
-      
+
       // 重置计数器
       likeCounters.value[postId] = 0
     } catch (error) {
@@ -218,7 +218,7 @@ onUnmounted(() => {
 .friends-circle {
   max-width: 1500px;
   margin: 0 auto;
-  padding: 15px 15px; /* 增加内边距，显得帖子被包裹 */
+  padding: 5px 15px; /* 修改顶部内边距为0 */
   min-height: 100vh;
   background-color: #fff; /* 白色背景 */
   border-radius: 16px; /* 可以加圆角 */
@@ -238,8 +238,9 @@ onUnmounted(() => {
   background-color: #FFEFEF;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 15px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
   position: relative;

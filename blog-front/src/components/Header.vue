@@ -19,10 +19,15 @@
         <img src="@/assets/icons/about.png" alt="关于我" class="nav-icon" />
         关于我
       </router-link>
-      <router-link to="/login" class="nav-item login-btn">
-        <img src="@/assets/icons/登录.png" alt="登录/注册" class="nav-icon" />
-        {{ loginButtonText }}
-      </router-link>
+      <template v-if="!isLoggedIn">
+        <router-link to="/login" class="nav-item login-btn">
+          <img src="@/assets/icons/登录.png" alt="登录/注册" class="nav-icon" />
+          登录/注册
+        </router-link>
+      </template>
+      <template v-else>
+        <UserDropdown />
+      </template>
     </nav>
   </header>
 </template>
@@ -30,8 +35,11 @@
 <script setup>
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useUserStore } from '@/stores/user';
+import UserDropdown from './UserDropdown.vue';
 
 const route = useRoute();
+const userStore = useUserStore();
 
 // 在首页(LandingPage)不显示头部
 const shouldShowHeader = computed(() => {
@@ -40,12 +48,7 @@ const shouldShowHeader = computed(() => {
 
 // 获取登录状态
 const isLoggedIn = computed(() => {
-  return !!localStorage.getItem('token');
-});
-
-// 登录/注册按钮文本
-const loginButtonText = computed(() => {
-  return isLoggedIn.value ? '个人中心' : '登录/注册';
+  return userStore.isLoggedIn;
 });
 </script>
 
@@ -55,9 +58,8 @@ const loginButtonText = computed(() => {
   justify-content: space-between;
   align-items: center;
   padding: 8px 16px;
-  background: linear-gradient(to top, rgba(255, 200, 200, 0.7), rgba(255, 255, 255, 0.7));
+  background: linear-gradient(to top, rgb(255, 200, 200), rgb(255, 255, 255));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
   border-radius: 16px;
   margin: 8px;
   border-bottom: 2px solid rgba(255, 150, 150, 0.5);

@@ -237,7 +237,7 @@ const handleComment = async (commentData) => {
   width: 100%;
   max-width: 1800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0px 20px; /* 修改顶部内边距为0 */
 }
 
 .left-panel,
@@ -288,5 +288,16 @@ const handleComment = async (commentData) => {
   margin-bottom: 20px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   border: 2px solid #ffd6db;
+}
+
+.friends-circle {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0px 15px; /* 修改顶部内边距为0 */
+  min-height: 100vh;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  border: 4px solid #ffd6db;
 }
 </style>
