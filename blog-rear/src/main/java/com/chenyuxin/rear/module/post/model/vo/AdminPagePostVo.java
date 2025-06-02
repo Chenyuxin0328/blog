@@ -1,4 +1,4 @@
-package com.chenyuxin.rear.module.post.model.dto;
+package com.chenyuxin.rear.module.post.model.vo;
 
 import lombok.Data;
 
@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class CreatePostDto {
+public class AdminPagePostVo {
+    private Long id;
 
     private String text;
 
@@ -14,7 +15,11 @@ public class CreatePostDto {
 
     private Integer viewScope;
 
+    private Integer likeCount;
+
+    private Integer commentCount;
+
     private LocalDateTime createTime;
 
-    private List<Long> imageIds;
+    private List<ImageDataVo> imageDataVos;
 }

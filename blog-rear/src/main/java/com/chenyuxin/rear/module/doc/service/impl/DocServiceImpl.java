@@ -1,5 +1,6 @@
 package com.chenyuxin.rear.module.doc.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,12 +12,11 @@ import com.chenyuxin.rear.module.doc.mapper.DocCategoryMapper;
 import com.chenyuxin.rear.module.doc.mapper.DocMapper;
 import com.chenyuxin.rear.module.doc.model.dto.CreateCategoryDto;
 import com.chenyuxin.rear.module.doc.model.dto.CreateDocDto;
+import com.chenyuxin.rear.module.doc.model.dto.UpdateCategoryDto;
+import com.chenyuxin.rear.module.doc.model.dto.UpdateDocDto;
 import com.chenyuxin.rear.module.doc.model.entity.Doc;
 import com.chenyuxin.rear.module.doc.model.entity.DocCategory;
-import com.chenyuxin.rear.module.doc.model.vo.GetRecentDocVo;
-import com.chenyuxin.rear.module.doc.model.vo.PageDocVo;
-import com.chenyuxin.rear.module.doc.model.vo.SelectDocCategoryVo;
-import com.chenyuxin.rear.module.doc.model.vo.UploadBackgroundVo;
+import com.chenyuxin.rear.module.doc.model.vo.*;
 import com.chenyuxin.rear.module.doc.service.DocService;
 import com.chenyuxin.rear.module.file.constant.MinioBucket;
 import com.chenyuxin.rear.module.file.mapper.FileStoreMapper;
@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +47,9 @@ public class DocServiceImpl implements DocService {
     private FileStoreService fileStoreService;
     @Autowired
     private WeeklyStatsService weeklyStatsService;
+    @Autowired
+    private FileStoreMapper fileStoreMapper;
+
     // 创建新的文档
     @Transactional
     @Override
@@ -124,7 +128,9 @@ public class DocServiceImpl implements DocService {
 
     @Override
     public List<SelectDocCategoryVo> selectDocCategory() {
-        List<SelectDocCategoryVo> docCategories = docCategoryMapper.selectList(null)
+        LambdaQueryWrapper<DocCategory> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DocCategory::getIsDelete,0);
+        List<SelectDocCategoryVo> docCategories = docCategoryMapper.selectList(wrapper)
                 .stream().map(docCategory ->
                     BeanCopyUtil.copy(docCategory,SelectDocCategoryVo.class)
         ).toList();
@@ -143,5 +149,45 @@ public class DocServiceImpl implements DocService {
                 .map(doc -> BeanCopyUtil.copy(doc,GetRecentDocVo.class) )
                 .toList();
         return getRecentDocVos;
+    }
+    // 更新博客记录
+    @Override
+    public void updateDoc(UpdateDocDto updateDocDto) {
+        // 更新技术文档
+        Doc doc = docMapper.selectById(updateDocDto.getId());
+        Long oldBackgroundId = doc.getBackgroundId();
+        LambdaUpdateWrapper<Doc> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(Doc::getId,updateDocDto.getId())
+                .set(Doc::getBackgroundId,updateDocDto.getBackgroundId())
+                .set(Doc::getTitle,updateDocDto.getTitle())
+                .set(Doc::getGeneral,updateDocDto.getGeneral())
+                .set(Doc::getCategoryId,updateDocDto.getCategoryId())
+                .set(Doc::getUrl,updateDocDto.getUrl())
+                .set(Doc::getWriteTime,updateDocDto.getWriteTime())
+                .set(Doc::getViewScope,updateDocDto.getViewScope())
+                .set(Doc::getUpdateTime,LocalDateTime.now());
+        docMapper.update(wrapper);
+        // 修改文件状态
+        if(!Objects.equals(oldBackgroundId, updateDocDto.getBackgroundId())){
+            LambdaUpdateWrapper<FileStorage> fileWrapper = new LambdaUpdateWrapper<>();
+            fileWrapper.eq(FileStorage::getId,oldBackgroundId)
+                    .set(FileStorage::getStatus,0);
+            fileStoreMapper.update(fileWrapper);
+        }
+    }
+    // 更新分类名称
+    @Override
+    public void updateCategory(UpdateCategoryDto updateCategoryDto) {
+        LambdaUpdateWrapper<DocCategory> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(DocCategory::getId,updateCategoryDto.getId())
+                .set(DocCategory::getCategoryName,updateCategoryDto.getCategoryName());
+        docCategoryMapper.update(wrapper);
+    }
+    // 管理端分页查询技术文档
+    @Override
+    public PageResult<AdminPageDocVo> adminPageDoc(Long categoryId, String search, Integer pageNum, Integer pageSize) {
+        Page<AdminPageDocVo> page = new Page<>(pageNum, pageSize);
+        IPage<AdminPageDocVo> pageDocVoIPage = docMapper.adminPageDoc(page,categoryId,search,pageNum,pageSize);
+        return new PageResult<AdminPageDocVo>(pageNum,pageSize,pageDocVoIPage.getTotal(),pageDocVoIPage.getRecords());
     }
 }

@@ -1,8 +1,13 @@
 package com.chenyuxin.rear.module.user.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chenyuxin.rear.common.exception.BusinessException;
 import com.chenyuxin.rear.common.exception.ErrorCode;
+import com.chenyuxin.rear.common.model.PageResult;
 import com.chenyuxin.rear.common.model.Result;
 import com.chenyuxin.rear.common.util.BeanCopyUtil;
 import com.chenyuxin.rear.module.file.constant.MinioBucket;
@@ -11,12 +16,15 @@ import com.chenyuxin.rear.module.user.model.dto.GetUserInfoDto;
 import com.chenyuxin.rear.module.user.model.dto.RegisterDto;
 import com.chenyuxin.rear.module.user.model.dto.UpdateAvatarDto;
 import com.chenyuxin.rear.module.user.model.entity.User;
+import com.chenyuxin.rear.module.user.model.vo.SelectPageUser;
 import com.chenyuxin.rear.module.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -63,6 +71,40 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectById(userId);
         GetUserInfoDto getUserInfoDto = BeanCopyUtil.copy(user, GetUserInfoDto.class);
         return getUserInfoDto;
+    }
+    // 分页查询用户
+    @Override
+    public PageResult<SelectPageUser> selectPageUser(String search, String role, Integer pageNum, Integer pageSize) {
+        IPage<User> page = new Page<>(pageNum,pageSize);
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(search)) {
+            wrapper.like(User::getUsername, search);
+        }
+        if (StringUtils.isNotBlank(role)) {
+            wrapper.eq(User::getRole, role);
+        }
+        wrapper.orderByDesc(User::getCreateTime);
+        IPage<User> userIPage = userMapper.selectPage(page, wrapper);
+        List<SelectPageUser> selectPageUsers = userIPage.getRecords().stream()
+                .map(user -> BeanCopyUtil.copy(user, SelectPageUser.class))
+                .toList();
+        return new PageResult<>(pageNum,pageSize,userIPage.getTotal(),selectPageUsers);
+    }
+    // 根据用户id删除用户
+    @Override
+    public void deleteUserById(Long userId) {
+        userMapper.deleteById(userId);
+    }
+
+
+
+    // 赋予用户管理员权限
+    @Override
+    public void setUserRole(Long userId,String role) {
+        LambdaUpdateWrapper<User> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(User::getId,userId)
+                .set(User::getRole,role);
+        userMapper.update(wrapper);
     }
 
 }

@@ -25,6 +25,19 @@
             <result property="content" column="comment_content"/>
         </collection>
     </resultMap>
+    <resultMap id="AdminPagePostVo" type="com.chenyuxin.rear.module.post.model.vo.AdminPagePostVo">
+        <id property="id" column="post_id"/>
+        <result property="text" column="text"/>
+        <result property="location" column="location"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createTime" column="create_time"/>
+        <result property="viewScope" column="view_scope"/>
+        <collection property="imageDataVos" ofType="com.chenyuxin.rear.module.post.model.vo.ImageDataVo">
+            <result property="id" column="image_id"/>
+            <result property="url" column="image_url"/>
+        </collection>
+    </resultMap>
     <select id="countByViewScope" resultType="int">
         SELECT COUNT(*)
         FROM blog.post
@@ -58,12 +71,50 @@
         LEFT JOIN blog.post_comment c ON p.id = c.post_id AND c.is_delete = 0
         LEFT JOIN blog.user u ON c.user_id = u.id
     </select>
-    <select id="getLikeAndCommentStats" resultType="map">
+    <select id="getLikeAndCommentStats" resultType="java.util.Map">
         SELECT
             SUM(like_count),
             SUM(comment_count)
         FROM blog.post
         WHERE is_delete = 0
+    </select>
+    <select id="selectPageAdmin" resultMap="AdminPagePostVo">
+        SELECT
+            p.id AS post_id,
+            p.text,
+            p.location,
+            p.like_count,
+            p.comment_count,
+            p.view_scope,
+            p.create_time,
+            fs.url AS image_url,
+            fs.id As image_id
+
+        FROM (
+                 SELECT *
+                 FROM blog.post
+                <where>
+                    <if test="search != null and search != ''">
+                        (location LIKE CONCAT('%', #{search}, '%') OR text LIKE CONCAT('%', #{search}, '%')) AND
+                    </if>
+                    is_delete = 0
+                </where>
+                ORDER BY create_time DESC
+                 limit #{offset},#{pageSize}
+             ) p
+                 LEFT JOIN blog.post_image pi ON p.id = pi.post_id
+                 LEFT JOIN blog.file_storage fs ON pi.file_id = fs.id
+    </select>
+    <!-- 查询总数 -->
+    <select id="selectPageAdminCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM blog.post
+        <where>
+            <if test="search != null and search != ''">
+                (location LIKE CONCAT('%', #{search}, '%') OR text LIKE CONCAT('%', #{search}, '%')) AND
+            </if>
+            is_delete = 0
+        </where>
     </select>
 
 

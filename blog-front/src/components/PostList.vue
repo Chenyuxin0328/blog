@@ -56,8 +56,12 @@
         </div>
       </div>
 
+      <!-- 评论区域包装器 -->
+      <div class="comments-wrapper" :class="{ 'has-input': activeCommentId === item.id }">
       <!-- 评论输入框 -->
+        <transition name="comment-slide">
       <div class="comment-input-container" v-if="activeCommentId === item.id">
+            <div class="comment-input-wrapper">
         <input
           type="text"
           class="comment-input"
@@ -65,9 +69,14 @@
           placeholder="写下你的评论..."
           @keyup.enter="submitComment(item.id)"
         />
-        <button class="comment-submit" @click="submitComment(item.id)">发送</button>
+              <button class="comment-submit" @click="submitComment(item.id)">
+                <span class="submit-text">发送</span>
+              </button>
+            </div>
       </div>
+        </transition>
 
+        <!-- 评论列表区域 -->
       <div class="comments-section" v-if="item.comments && item.comments.length > 0">
         <div
             class="comment"
@@ -78,6 +87,7 @@
           <div class="comment-content">
             <span class="comment-username">{{ comment.username }}</span>
             <span class="comment-text">{{ comment.content }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -230,7 +240,10 @@ onUnmounted(() => {
   border-radius: 8px;
   padding: 12px;
   margin-top: 15px;
-  border: 2px solid #ffd6db; /* 粉红色边框 */
+  border: 2px solid #ffd6db;
+  transform-origin: top;
+  will-change: transform, opacity;
+  transition: all 0.15s linear;
 }
 
 
@@ -245,6 +258,9 @@ onUnmounted(() => {
   border: 2px solid transparent;
   position: relative;
   overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .friends-post::before {
@@ -433,54 +449,149 @@ onUnmounted(() => {
   color: #ff69b4;
 }
 
-.comment-input-container {
-  display: flex;
+/* 评论区域包装器 */
+.comments-wrapper {
+  position: relative;
+  transition: all 0.15s linear;
+}
+
+.comments-wrapper.has-input {
   margin-top: 15px;
-  margin-bottom: 10px;
+}
+
+/* 评论框动画 */
+.comment-slide-enter-active,
+.comment-slide-leave-active {
+  transition: all 0.15s linear;
+  position: relative;
+  z-index: 2;
+}
+
+.comment-slide-enter-from,
+.comment-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-15px);
+}
+
+/* 评论框容器样式 */
+.comment-input-container {
+  padding: 12px;
+  background: #fff5f7;
+  border-radius: 12px;
+  border: 2px solid #ffd6db;
+  transform-origin: top;
+  will-change: transform, opacity;
+  transition: all 0.15s linear;
+  margin-bottom: 15px;
+}
+
+.comment-input-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+  border-color: #ffb6c1;
+}
+
+.comment-input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .comment-input {
   flex: 1;
-  padding: 10px 15px;
-  border: 2px solid #ffd6db;
-  border-radius: 25px;
-  background-color: white;
+  padding: 12px 16px;
+  border: 2px solid #ffe4e8;
+  border-radius: 20px;
   font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s;
+  background: white;
+  transition: all 0.2s ease-out;
+}
+
+.comment-input:hover {
+  border-color: #ffb6c1;
+  transform: translateY(-1px);
 }
 
 .comment-input:focus {
-  border-color: #ff7eb9;
+  outline: none;
+  border-color: #ff8da1;
+  box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.2);
+  transform: translateY(-2px);
 }
 
 .comment-submit {
-  margin-left: 10px;
-  padding: 8px 15px;
-  background-color: #ffaed2;
-  color: white;
+  padding: 10px 20px;
   border: none;
   border-radius: 20px;
+  background: linear-gradient(135deg, #ff8da1 0%, #ff69b4 100%);
+  color: white;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  transition: all 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .comment-submit:hover {
-  background-color: #ff7eb9;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+  background: linear-gradient(135deg, #ff69b4 0%, #ff8da1 100%);
 }
 
-.comments-section {
-  background-color: #FFF8F8;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 15px;
+.comment-submit:active {
+  transform: translateY(0) scale(0.98);
 }
 
+.submit-text {
+  font-size: 14px;
+}
+
+.submit-icon {
+  font-size: 16px;
+  transition: all 0.2s ease-out;
+}
+
+.comment-submit:hover .submit-icon {
+  transform: rotate(180deg) scale(1.2);
+}
+
+/* 评论框占位符样式 */
+.comment-input::placeholder {
+  color: #ffb6c1;
+  transition: all 0.2s ease-out;
+}
+
+.comment-input:focus::placeholder {
+  opacity: 0.7;
+  transform: translateX(5px);
+}
+
+/* 确保评论框在动画时不会影响布局 */
+.friends-post {
+  overflow: visible;
+}
+
+/* 评论条目样式 */
 .comment {
   display: flex;
-  align-items: center;  /* 垂直居中对齐 */
+  align-items: center;
   margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease-out;
+  transform-origin: left center;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.comment:hover {
+  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(255, 182, 193, 0.2);
+}
+
+.comment:last-child {
+  margin-bottom: 0;
 }
 
 .comment-avatar {

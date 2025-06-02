@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.chenyuxin.rear.module.post.mapper.PostImageMapper">
+    <select id="selectAllByPostId" resultType="java.lang.Long">
+        SELECT
+        post_image.file_id
+        FROM post_image
+        WHERE post_image.post_id = #{postId}
+    </select>
+
+
+
+
+</mapper>

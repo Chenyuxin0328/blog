@@ -2,6 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { API_BASE_URL } from '@/config'
 import router from '@/router'
+import { useUserStore } from '@/stores/user'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -21,9 +22,12 @@ request.interceptors.request.use(
       config.headers = {}
     }
 
-    // 设置通用headers
-    config.headers['Content-Type'] = 'application/json'
-    config.headers['Accept'] = 'application/json'
+    // 如果是FormData，不设置Content-Type，让浏览器自动设置
+    if (!(config.data instanceof FormData)) {
+      // 设置通用headers
+      config.headers['Content-Type'] = 'application/json'
+      config.headers['Accept'] = 'application/json'
+    }
 
     // 获取并设置token（如果存在）
     const token = localStorage.getItem('token')
@@ -54,9 +58,9 @@ request.interceptors.response.use(
       ElMessage.error(res.message || '请求失败')
       // 处理特定的错误码
       if (res.code === 401) {
-        // token过期或无效
-        localStorage.removeItem('token')
-        localStorage.removeItem('userInfo')
+        // token过期或无效，清除用户状态
+        const userStore = useUserStore()
+        userStore.clearUserInfo()
         router.push('/login')
       }
       return Promise.reject(new Error(res.message || '请求失败'))
@@ -65,11 +69,11 @@ request.interceptors.response.use(
   },
   error => {
     if (error.response) {
+      const userStore = useUserStore()
       switch (error.response.status) {
         case 401:
           ElMessage.error('未授权，请重新登录')
-          localStorage.removeItem('token')
-          localStorage.removeItem('userInfo')
+          userStore.clearUserInfo()
           router.push('/login')
           break
         case 403:
@@ -103,11 +107,12 @@ export function get(url, params) {
 }
 
 // 封装POST请求
-export function post(url, data) {
+export function post(url, data, config = {}) {
   return request({
     url,
     method: 'post',
-    data
+    data,
+    ...config
   })
 }
 

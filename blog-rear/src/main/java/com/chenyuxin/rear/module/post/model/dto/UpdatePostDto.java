@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class CreatePostDto {
+public class UpdatePostDto {
+    private Long id;
 
     private String text;
 

@@ -68,6 +68,29 @@
         </if>
         ORDER BY d.write_time DESC
     </select>
-
+    <select id="adminPageDoc" resultType="com.chenyuxin.rear.module.doc.model.vo.AdminPageDocVo">
+        SELECT
+        d.id,
+        f.url AS background_url,
+        d.background_id,
+        d.title,
+        d.general,
+        d.category_id,
+        c.category_name,
+        d.url,
+        d.write_time,
+        d.view_scope
+        FROM doc d
+        LEFT JOIN file_storage f ON d.background_id = f.id
+        LEFT JOIN doc_category c ON d.category_id = c.id
+        WHERE d.is_delete = 0
+        <if test="categoryId != null">
+            AND d.category_id = #{categoryId}
+        </if>
+        <if test="search != null and search != ''">
+            AND (d.title LIKE CONCAT('%', #{search}, '%') OR d.general LIKE CONCAT('%', #{search}, '%'))
+        </if>
+        ORDER BY d.write_time DESC
+    </select>
 
 </mapper>

@@ -1,9 +1,13 @@
 package com.chenyuxin.rear.module.doc.controller.admin;
 
+import com.chenyuxin.rear.common.model.PageResult;
 import com.chenyuxin.rear.common.model.Result;
 import com.chenyuxin.rear.common.validation.ImageFile;
 import com.chenyuxin.rear.module.doc.model.dto.CreateCategoryDto;
 import com.chenyuxin.rear.module.doc.model.dto.CreateDocDto;
+import com.chenyuxin.rear.module.doc.model.dto.UpdateCategoryDto;
+import com.chenyuxin.rear.module.doc.model.dto.UpdateDocDto;
+import com.chenyuxin.rear.module.doc.model.vo.AdminPageDocVo;
 import com.chenyuxin.rear.module.doc.model.vo.UploadBackgroundVo;
 import com.chenyuxin.rear.module.doc.service.DocService;
 import jakarta.validation.Valid;
@@ -45,5 +49,24 @@ public class DocAdminController {
     public Result<Void> deleteCategoryById(@PathVariable("categoryId") Long categoryId){
         docService.deleteCategoryById(categoryId);
         return Result.success();
+    }
+    // 修改博客
+    @PostMapping("/update")
+    public Result<Void> updateDoc(@RequestBody UpdateDocDto updateDocDto){
+        docService.updateDoc(updateDocDto);
+        return Result.success();
+    }
+    @PostMapping("/category/update")
+    public Result<Void> updateCategory(@RequestBody UpdateCategoryDto updateCategoryDto){
+        docService.updateCategory(updateCategoryDto);
+        return Result.success();
+    }
+    @GetMapping("/page")
+    public Result<PageResult<AdminPageDocVo>> adminPageDoc(@RequestParam(value = "categoryId",required = false) Long categoryId,
+                                                           @RequestParam(value = "search",required = false) String search,
+                                                           @RequestParam("pageNum") Integer pageNum,
+                                                           @RequestParam("pageSize") Integer pageSize){
+        PageResult<AdminPageDocVo> pageResult = docService.adminPageDoc(categoryId,search,pageNum,pageSize);
+        return Result.success(pageResult);
     }
 }

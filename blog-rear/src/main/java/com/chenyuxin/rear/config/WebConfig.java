@@ -19,15 +19,15 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**") // 拦截所有 API 请求
                 .excludePathPatterns("/auth/**","/user/register","/user/avatar","/user/username");
     }
-    
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("http://localhost:5173","http://115.190.94.156:5173") // 允许所有来源，生产环境建议指定具体域名
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("Authorization", "Content-Type", "X-Requested-With")
+                .allowedOriginPatterns("http://localhost:5173", "http://115.190.94.156:5173") // 根据你实际部署情况改
+                .allowedMethods("*")
+                .allowedHeaders("*") // 推荐使用 *，避免 Authorization 被忽略
                 .exposedHeaders("Authorization")
                 .allowCredentials(true)
-                .maxAge(3600); // 预检请求的有效期，单位为秒
+                .maxAge(3600);
     }
+
 }

@@ -15,9 +15,14 @@
         <img src="@/assets/icons/docs.png" alt="技术文档" class="nav-icon" />
         技术文档
       </router-link>
+
       <router-link to="/about" class="nav-item">
         <img src="@/assets/icons/about.png" alt="关于我" class="nav-icon" />
         关于我
+      </router-link>
+      <router-link v-if="isAdmin" to="/admin" class="nav-item">
+        <img src="@/assets/icons/admin.png" alt="管理端" class="nav-icon" />
+        管理端
       </router-link>
       <template v-if="!isLoggedIn">
         <router-link to="/login" class="nav-item login-btn">
@@ -49,6 +54,11 @@ const shouldShowHeader = computed(() => {
 // 获取登录状态
 const isLoggedIn = computed(() => {
   return userStore.isLoggedIn;
+});
+
+// 判断是否为管理员
+const isAdmin = computed(() => {
+  return userStore.userInfo?.user?.role === 'admin';
 });
 </script>
 

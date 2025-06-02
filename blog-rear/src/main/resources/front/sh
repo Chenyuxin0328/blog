@@ -1,5 +1,5 @@
 docker run -d -p 5173:5173 \
   --name blog-front \
   --restart always \
-  blog-front:2.0
-docker build -t blog-front:2.0 .
+  blog-front:3.0
+docker build -t blog-front:3.0 .

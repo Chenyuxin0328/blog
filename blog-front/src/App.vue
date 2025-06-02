@@ -6,6 +6,8 @@ import { onMounted } from 'vue';
 onMounted(() => {
   // 给body添加已加载标记，用于触发动画
   document.body.classList.add('content-loaded');
+  // 设置默认缩放比例为80%
+  document.body.style.zoom = '80%';
 });
 </script>
 

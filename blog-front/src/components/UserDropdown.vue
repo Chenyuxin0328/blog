@@ -2,21 +2,21 @@
   <div class="user-dropdown" v-click-outside="hideDropdown">
     <!-- 触发按钮 -->
     <div class="user-trigger" @click="toggleDropdown">
-      <el-avatar 
-        :size="32" 
+      <el-avatar
+        :size="32"
         :src="currentUser.avatar"
         :default-src="defaultAvatar"
         class="user-avatar"
       />
-      <span class="username">{{ currentUser.username || '未知用户' }}</span>
+      <span class="username">{{ currentUser.username || '匿名用户' }}</span>
       <i class="el-icon-arrow-down" :class="{ 'is-active': isVisible }"></i>
     </div>
 
     <!-- 下拉卡片 -->
     <div class="dropdown-card" v-show="isVisible">
       <div class="card-header">
-        <el-avatar 
-          :size="60" 
+        <el-avatar
+          :size="60"
           :src="currentUser.avatar"
           :default-src="defaultAvatar"
           class="large-avatar"
@@ -128,8 +128,8 @@ const vClickOutside = {
 
 .username {
   color: #333;
-  font-weight: 500;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 15px;
 }
 
 .el-icon-arrow-down {
@@ -356,4 +356,4 @@ const vClickOutside = {
     transform: scale(1) translateY(0);
   }
 }
-</style> 
+</style>
